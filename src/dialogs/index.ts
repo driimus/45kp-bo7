@@ -16,15 +16,21 @@ import {
 import * as Texts from '../texts';
 import { UserProfile } from '../userProfile';
 
-const CHOICE_PROMPT = 'CHOICE_PROMPT';
-const CONFIRM_PROMPT = 'CONFIRM_PROMPT';
 const NAME_PROMPT = 'NAME_PROMPT';
+const CHOICE_PROMPT = 'CHOICE_PROMPT';
+const TYPE_CHOICE_PROMPT = 'TYPE_CHOICE_PROMPT';
+const ARGUMENT_PROMPT = 'ARGUMENT_PROMPT';
 const USER_PROFILE = 'USER_PROFILE';
 const WATERFALL_DIALOG = 'WATERFALL_DIALOG';
 
 const fruitChoices = {
-    Apples: ['Gala', 'Fuji', 'Braeburn'],
-    Pears: ['Forelle', 'Bosc', 'Bartlett']
+    Apples: 'apple',
+    Pears: 'pear'
+};
+
+const fruits = {
+    apple: ['Gala', 'Fuji', 'Braeburn'],
+    pear: ['Forelle', 'Bosc', 'Bartlett']
 };
 
 export class UserProfileDialog extends ComponentDialog {
@@ -37,10 +43,15 @@ export class UserProfileDialog extends ComponentDialog {
 
         this.addDialog(new TextPrompt(NAME_PROMPT));
         this.addDialog(new ChoicePrompt(CHOICE_PROMPT));
+        this.addDialog(new TextPrompt(ARGUMENT_PROMPT));
+        this.addDialog(new ChoicePrompt(TYPE_CHOICE_PROMPT));
 
         this.addDialog(new WaterfallDialog(WATERFALL_DIALOG, [
             this.nameStep.bind(this),
-            this.fruitChoiceStep.bind(this)
+            this.fruitChoiceStep.bind(this),
+            this.argumentStep.bind(this),
+            this.fruitTypeChoiceStep.bind(this)
+
         ]));
 
         this.initialDialogId = WATERFALL_DIALOG;
@@ -76,6 +87,19 @@ export class UserProfileDialog extends ComponentDialog {
             prompt: Texts.fruitChoiceText(userProfile.name)
         });
     }
-        // // Finish with the end of the Waterfall dialog.
-        // return await stepContext.endDialog();
+
+    private async argumentStep(stepContext: WaterfallStepContext<UserProfile>) {
+        stepContext.options.fruit = fruitChoices[stepContext.result.value];
+
+        return await stepContext.prompt(ARGUMENT_PROMPT,
+            Texts.argumentPromptText(`${stepContext.options.fruit}s`));
+    }
+
+    private async fruitTypeChoiceStep(stepContext: WaterfallStepContext<UserProfile>) {
+        const { fruit } = stepContext.options;
+        return await stepContext.prompt(TYPE_CHOICE_PROMPT, {
+            choices: ChoiceFactory.toChoices(fruits[fruit]),
+            prompt: Texts.fruitTypeChoiceText(fruit)
+        });
+    }
 }

@@ -1,8 +1,7 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-
 export class UserProfile {
-    public transport: string;
     public name: string;
-    public age: number;
+    public fruit: string;
+    public fruitArgument: string;
+    public fruitType: string;
+    public fruitTypeArgument: string;
 }
