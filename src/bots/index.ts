@@ -4,6 +4,7 @@
 import { ActivityHandler, BotState, ConversationState, StatePropertyAccessor, UserState  } from 'botbuilder';
 import { Dialog, DialogState } from 'botbuilder-dialogs';
 import { UserProfileDialog } from '../dialogs';
+import { welcomeText } from '../texts';
 
 export class ApBot extends ActivityHandler {
     private name = 'ApBot';
@@ -43,6 +44,23 @@ export class ApBot extends ActivityHandler {
             await this.conversationState.saveChanges(context, false);
             await this.userState.saveChanges(context, false);
 
+            await next();
+        });
+
+        // Sends welcome messages to conversation members when they join the conversation.
+        this.onMembersAdded(async (context, next) => {
+            const { membersAdded, recipient } = context.activity;
+            // Iterate over all new members added to the conversation
+            for (const idx in membersAdded) {
+                // Greet anyone that was not the target (recipient) of this message.
+                if (membersAdded[idx].id === recipient.id) continue;
+
+                await context.sendActivity(welcomeText(this.name));
+                // Run the Dialog with the new message Activity.
+                await (this.dialog as UserProfileDialog).run(context, this.dialogState);
+            }
+
+            // By calling next() you ensure that the next BotHandler is run.
             await next();
         });
     }
