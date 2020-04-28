@@ -50,8 +50,8 @@ const conversationState = new ConversationState(memoryStorage);
 const userState = new UserState(memoryStorage);
 
 // Create the main dialog.
-const dialog = new UserProfileDialog(userState);
-const bot = new ApBot(conversationState, userState, dialog);
+const dialog = new UserProfileDialog('ApBot', userState);
+const bot = new ApBot('ApBot', conversationState, userState, dialog);
 
 // Create HTTP server.
 const server = restify.createServer();

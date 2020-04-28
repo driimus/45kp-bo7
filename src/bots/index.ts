@@ -4,35 +4,35 @@
 import { ActivityHandler, BotState, ConversationState, StatePropertyAccessor, UserState  } from 'botbuilder';
 import { Dialog, DialogState } from 'botbuilder-dialogs';
 import { UserProfileDialog } from '../dialogs';
-import { welcomeText } from '../texts';
+import { farewellText, welcomeText } from '../texts';
 
 export class ApBot extends ActivityHandler {
-    private name = 'ApBot';
+    private name: string;
     private conversationState: BotState;
     private userState: BotState;
     private dialog: Dialog;
     private dialogState: StatePropertyAccessor<DialogState>;
 
     /**
-     *
+     * Initializes the bot.
+     * @param {string} name
      * @param {ConversationState} conversationState
      * @param {UserState} userState
      * @param {Dialog} dialog
      */
-    constructor(conversationState: BotState, userState: BotState, dialog: Dialog) {
+    constructor(name: string, conversationState: BotState, userState: BotState, dialog: Dialog) {
         super();
         if (!conversationState) throw new Error(`[${this.name}]: Missing parameter. conversationState is required`);
         if (!userState) throw new Error(`[${this.name}]: Missing parameter. userState is required`);
         if (!dialog) throw new Error(`[${this.name}]: Missing parameter. dialog is required`);
 
+        this.name = name;
         this.conversationState = conversationState as ConversationState;
         this.userState = userState as UserState;
         this.dialog = dialog;
         this.dialogState = this.conversationState.createProperty('DialogState');
 
         this.onMessage(async (context, next) => {
-            console.log('Running dialog with Message Activity.');
-
             // Run the Dialog with the new message Activity.
             await (this.dialog as UserProfileDialog).run(context, this.dialogState);
 

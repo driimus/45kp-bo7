@@ -1,7 +1,7 @@
 export class UserProfile {
     public name: string;
     public fruit: string;
-    public fruitArgument: string;
+    public argument: string;
     public fruitType: string;
-    public fruitTypeArgument: string;
+    public typeArgument: string;
 }
